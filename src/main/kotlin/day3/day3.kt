@@ -15,17 +15,11 @@ fun parseInput(): List<Pair<Items, Items>> {
 }
 
 fun misplacedItem(left: Items, right: Items): Item {
-    for (item in left) {
-        if (right.contains(item)) {
-            return item
-        }
-    }
-
-    throw Exception("No misplaced item found")
+    return left.first { right.contains(it) }
 }
 
 fun Item.priority(): Int {
-    return if (this.isLowerCase()) this.code - 96 else this.code - 38
+    return if (isLowerCase()) code - 96 else code - 38
 }
 
 fun part1(): Int {
@@ -33,13 +27,7 @@ fun part1(): Int {
 }
 
 fun commonItem(rucksacks: List<Items>): Item {
-    for (item in rucksacks.first()) {
-        if (rucksacks.all { it.contains(item) }) {
-            return item
-        }
-    }
-
-    throw Exception("No common item found")
+    return rucksacks.first().first { item -> rucksacks.all { it.contains(item) } }
 }
 
 fun part2(): Int {
