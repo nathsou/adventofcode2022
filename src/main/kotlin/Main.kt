@@ -4,8 +4,9 @@ val solutions = mapOf(
     2 to Pair({ day2.part1() }, { day2.part2() }),
     3 to Pair({ day3.part1() }, { day3.part2() }),
     4 to Pair({ day4.part1() }, { day4.part2() }),
+    5 to Pair({ day5.part1() }, { day5.part2() }),
 )
 
 fun main() {
-    println(solutions.getValue(4).second())
+    println(solutions.getValue(5).second())
 }
