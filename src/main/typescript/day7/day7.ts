@@ -1,8 +1,8 @@
 import { readFileSync } from 'fs';
 import { match, DataType, VariantOf } from 'itsamatch';
-import { filter, sum } from '../utils/iterators';
+import { filter, min, sum } from '../utils/iterators';
 
-type Cmd = DataType<{
+type Command = DataType<{
     CD: { name: string },
     LS: {},
     File: { size: number, name: string },
@@ -14,7 +14,7 @@ const regexes = {
     dir: new RegExp('dir (.*)'),
 };
 
-const parseCommand = (line: string): Cmd => {
+const parseCommand = (line: string): Command => {
     if (line === '$ ls') {
         return { variant: 'LS' };
     }
@@ -43,7 +43,7 @@ type FileTree = DataType<{
     },
 }>;
 
-const interpret = (commands: Cmd[]): VariantOf<FileTree, 'Dir'> => {
+const interpret = (commands: Command[]): VariantOf<FileTree, 'Dir'> => {
     let currentDir: VariantOf<FileTree, 'Dir'> = {
         variant: 'Dir',
         path: [],
@@ -56,7 +56,7 @@ const interpret = (commands: Cmd[]): VariantOf<FileTree, 'Dir'> => {
     const root: FileTree = currentDir;
 
     for (const cmd of commands) {
-        match(cmd as Cmd, {
+        match(cmd, {
             CD: ({ name }) => {
                 if (name == '/') {
                     currentDir = root;
@@ -71,7 +71,7 @@ const interpret = (commands: Cmd[]): VariantOf<FileTree, 'Dir'> => {
                     if (dest?.variant === 'Dir') {
                         currentDir = dest;
                     } else {
-                        throw `dir ${name} not found`;
+                        throw `directory '${name}' not found`;
                     }
                 }
             },
@@ -104,19 +104,11 @@ const sizeOf = (file: FileTree): number => {
 const traverse = (root: VariantOf<FileTree, 'Dir'>) => {
     const sizes = new Map<string, number>();
 
-    const aux = (file: FileTree): number => {
+    const aux = (file: FileTree) => {
         if (file.variant === 'Dir') {
-            const size = sizeOf(file);
-            sizes.set(file.path.join('/') + '/' + file.name, size);
-
-            for (const f of file.files) {
-                aux(f);
-            }
-
-            return size;
+            sizes.set(file.path.join('/') + '/' + file.name, sizeOf(file));
+            file.files.forEach(aux);
         }
-
-        return 0;
     };
 
     aux(root);
@@ -147,17 +139,9 @@ const part2 = (): number => {
     const usedSpace = sizes.get('/')!;
     const unusedSpace = 70000000 - usedSpace;
     const minSpaceRequired = 30000000 - unusedSpace;
-    const candidates = filter(sizes.entries(), ([_, size]) => size >= minSpaceRequired);
+    const candidates = filter(sizes.values(), size => size >= minSpaceRequired);
 
-    let min = { path: '', size: Infinity };
-
-    for (const [path, size] of candidates) {
-        if (size < min.size) {
-            min = { path, size };
-        }
-    }
-
-    return min.size;
+    return min(candidates).value;
 };
 
-console.log(part1());
+console.log(part2());
