@@ -24,3 +24,5 @@ hs_err_pid*
 replay_pid*
 
 /out
+
+/src/main/typescript/node_modules

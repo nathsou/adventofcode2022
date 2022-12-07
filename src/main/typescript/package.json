@@ -1,0 +1,18 @@
+{
+  "type": "module",
+    "dependencies": {
+      "@types/node": "^18.11.11",
+      "itsamatch": "^1.1.2"
+    },
+    "name": "aoc22",
+    "version": "1.0.0",
+    "main": "index.js",
+    "devDependencies": {},
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "MIT",
+    "description": ""
+  }
+  
