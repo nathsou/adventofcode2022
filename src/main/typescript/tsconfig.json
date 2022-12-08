@@ -5,7 +5,7 @@
         "target": "ES2021",
         "strict": true
     },
-    "include": ["day7"],
+    "include": ["day7", "day8"],
     "exclude": [
         "node_modules"
     ]

@@ -347,3 +347,12 @@ export const sum = (vals: II<number>): number => {
 
 	return total;
 };
+
+export function* pairs<U, V>(as: II<U>, bs: II<V>): It<[U, V]> {
+	const bs_ = [...bs];
+	for (const a of as) {
+		for (const b of bs_) {
+			yield [a, b];
+		}
+	}
+}
