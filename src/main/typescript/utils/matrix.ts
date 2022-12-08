@@ -1,15 +1,28 @@
+import { map, range } from "./iterators";
+
 type Dimensions = { rows: number, cols: number };
 
 export class Matrix {
     dims: Dimensions;
     rows: number[][];
+    cols: number[][];
 
     constructor(rows: number[][]) {
-        this.rows = rows;
         this.dims = {
             rows: rows.length,
             cols: rows[0].length,
         };
+
+        this.rows = rows;
+        this.cols = [...map(range(0, this.dims.cols - 1), j => {
+            const column: number[] = [];
+
+            for (let i = 0; i < this.dims.rows; i++) {
+                column.push(this.rows[i][j]);
+            }
+
+            return column;
+        })];
     }
 
     toString(): string {
@@ -27,17 +40,11 @@ export class Matrix {
         return this.rows[i - 1][j - 1];
     }
 
-    column(j: number): number[] {
-        let col: number[] = [];
-
-        for (let i = 1; i <= this.dims.rows; i++) {
-            col.push(this.at(i, j));
-        }
-
-        return col;
+    row(i: number): number[] {
+        return this.rows[i - 1];
     }
 
-    row(i: number): number[] {
-        return this.rows[i];
+    column(j: number): number[] {
+        return this.cols[j - 1];
     }
 }

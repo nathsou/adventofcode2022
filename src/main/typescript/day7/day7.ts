@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs';
 import { match, DataType, VariantOf } from 'itsamatch';
 import { filter, min, sum } from '../utils/iterators';
+import { run } from '../utils/run';
 
 type Command = DataType<{
     CD: { name: string },
@@ -144,4 +145,4 @@ const part2 = (): number => {
     return min(candidates).value;
 };
 
-console.log(part2());
+run({ part1, part2 });

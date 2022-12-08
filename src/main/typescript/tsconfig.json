@@ -1,9 +1,10 @@
 {
     "compilerOptions": {
         "module": "ES6",
-        "moduleResolution": "node",
+        "moduleResolution": "Node",
         "target": "ES2021",
-        "strict": true
+        "strict": true,
+        "esModuleInterop": true
     },
     "include": ["day7", "day8"],
     "exclude": [

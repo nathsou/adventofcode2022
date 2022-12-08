@@ -134,18 +134,6 @@ export const findIndex = <T>(
 	return -1;
 };
 
-export function* slice<T>(
-	elems: II<T>,
-	start: number,
-	end = Infinity,
-): II<T> {
-	for (const [elem, i] of indexed(elems)) {
-		if (i >= start && i <= end) {
-			yield elem;
-		}
-	}
-}
-
 export const max = <T>(
 	iterable: II<T>,
 	gtr = (a: T, b: T) => a > b,
@@ -183,8 +171,14 @@ export const min = <T>(
 };
 
 export function* range(from: number, to: number, step = 1): It<number> {
-	for (let i = from; i >= to; i -= step) {
-		yield i;
+	if (to >= from) {
+		for (let i = from; i <= to; i += step) {
+			yield i;
+		}
+	} else {
+		for (let i = from; i >= to; i -= step) {
+			yield i;
+		}
 	}
 }
 
@@ -348,6 +342,16 @@ export const sum = (vals: II<number>): number => {
 	return total;
 };
 
+export const prod = (vals: II<number>): number => {
+	let p = 1;
+
+	for (const val of vals) {
+		p *= val;
+	}
+
+	return p;
+};
+
 export function* pairs<U, V>(as: II<U>, bs: II<V>): It<[U, V]> {
 	const bs_ = [...bs];
 	for (const a of as) {
@@ -356,3 +360,7 @@ export function* pairs<U, V>(as: II<U>, bs: II<V>): It<[U, V]> {
 		}
 	}
 }
+
+export const slice = <T>(xs: T[], start: number, endInclusive: number = xs.length - 1): II<T> => {
+	return map(range(start, endInclusive), i => xs[i]);
+};
