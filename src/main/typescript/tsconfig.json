@@ -6,7 +6,7 @@
         "strict": true,
         "esModuleInterop": true
     },
-    "include": ["day7", "day8", "day9", "day10"],
+    "include": ["**/*.ts"],
     "exclude": [
         "node_modules"
     ]

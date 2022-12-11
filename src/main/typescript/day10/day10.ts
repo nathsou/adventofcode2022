@@ -55,7 +55,7 @@ const State = {
     },
 };
 
-const part1 = () => {
+const part1 = (): number => {
     const instructions = parseInput();
     const state = State.make();
     const history = new Map<number, number>();
@@ -64,7 +64,7 @@ const part1 = () => {
 
     for (const inst of instructions) {
         Instruction.interpret(inst, state);
-        history.set(state.cycles, state.X)
+        history.set(state.cycles, state.X);
     }
 
     return sum([20, 60, 100, 140, 180, 220].map(n => State.at(n, history) * n));
@@ -74,7 +74,7 @@ const isSpriteVisible = (position: number, cycle: number) => {
     return Math.abs(position - (cycle % 40)) < 2;
 };
 
-const part2 = () => {
+const part2 = (): string => {
     const instructions = parseInput();
     const state = State.make();
     const screen = [...fill('.', 40 * 6)];
@@ -84,7 +84,7 @@ const part2 = () => {
     for (const inst of instructions) {
         const X = state.X;
         const instCycles = Instruction.interpret(inst, state);
-        for (let i = 0; i < instCycles; i++) {
+        for (const _ of range(1, instCycles)) {
             if (isSpriteVisible(X, pixel)) {
                 screen[pixel] = '#';
             }
