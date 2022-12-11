@@ -40,17 +40,14 @@ const parseInput = (): Monkey[] => {
     return [...map(chunks(lines, 6), parseMonkey)];
 };
 
-const evaluateOperation = (operation: Monkey['operation'], old: number): number => {
-    const { lhs, op, rhs } = operation;
+const evaluateOperation = ({ lhs, op, rhs }: Monkey['operation'], old: number): number => {
     const left = lhs === 'old' ? old : lhs;
     const right = rhs === 'old' ? old : rhs;
 
     switch (op) {
-        case '+':
-            return left + right;
-        case '*':
-            return left * right;
-    };
+        case '+': return left + right;
+        case '*': return left * right;
+    }
 };
 
 const takeTurn = (monkeys: Monkey[], monkey: Monkey, divideBy3: boolean): void => {
