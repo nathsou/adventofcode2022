@@ -84,9 +84,7 @@ const part2 = () => {
     const pairs = parseInput().flat();
     pairs.push([[2]], [[6]]);
     const sorted = pairs.sort((a, b) => ORDER_MAPPING[comparePackets(a, b)]).map(showPacket);
-    const packet1Index = sorted.indexOf('[[2]]');
-    const packet2Index = sorted.indexOf('[[6]]');
-    return (packet1Index + 1) * (packet2Index + 1);
+    return (sorted.indexOf('[[2]]') + 1) * (sorted.indexOf('[[6]]') + 1);
 };
 
 run({ part1, part2 });
