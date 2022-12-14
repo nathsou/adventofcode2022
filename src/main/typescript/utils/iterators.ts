@@ -244,6 +244,12 @@ export function find<T>(
 	return { value: null, index: -1 };
 }
 
+export function* forever(): II<undefined> {
+	while (true) {
+		yield;
+	}
+}
+
 export function count<T>(
 	as: II<T>,
 	pred: (a: T) => boolean,
@@ -364,3 +370,16 @@ export function* pairs<U, V>(as: II<U>, bs: II<V>): It<[U, V]> {
 export const slice = <T>(xs: T[], start: number, endInclusive: number = xs.length - 1): II<T> => {
 	return map(range(start, endInclusive), i => xs[i]);
 };
+
+export function* history<T>(it_: II<T>, historyLen = 2): It<T[]> {
+	const it = iter(it_);
+	const prev = [...take(it, historyLen)];
+
+	yield [...prev];
+
+	for (const val of it) {
+		prev.shift();
+		yield [...prev, val];
+		prev.push(val);
+	}
+}
