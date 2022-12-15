@@ -9,4 +9,5 @@ export const Vec2 = {
     dot: ([x1, y1]: Vec2, [x2, y2]: Vec2) => x1 * x2 + y1 * y2,
     angle: (u: Vec2, v: Vec2) => Math.acos(Vec2.dot(u, v) / (Vec2.len(u) * Vec2.len(v))),
     orthogonal: ([a, b]: Vec2): Vec2 => [-b, a],
+    manhattan: ([x1, y1]: Vec2, [x2, y2]: Vec2) => Math.abs(x1 - x2) + Math.abs(y1 - y2),
 };

@@ -5,7 +5,6 @@ import { Vec2 } from '../utils/vectors';
 
 type Line = [Vec2, Vec2];
 type Path = Line[];
-type CellState = 'sand' | 'air' | 'rock';
 
 const parsePath = (line: string): Path => {
     const points = line
@@ -24,18 +23,19 @@ const parseInput = (): Path[] => {
 };
 
 class Sandbox {
-    private grid: Map<`${number}:${number}`, CellState> = new Map();
+    private occupiedCells = new Set<`${number}:${number}`>();
     private deepestLineY: number;
+    private SPOTS: Vec2[] = [[0, 1], [-1, 1], [1, 1]];
 
     constructor(paths: Path[]) {
         for (const path of paths) {
             for (const [start, end] of path) {
                 for (const x of range(start[0], end[0])) {
-                    this.grid.set(`${x}:${start[1]}`, 'rock');
+                    this.occupiedCells.add(`${x}:${start[1]}`);
                 }
 
                 for (const y of range(start[1], end[1])) {
-                    this.grid.set(`${end[0]}:${y}`, 'rock');
+                    this.occupiedCells.add(`${end[0]}:${y}`);
                 }
             }
         }
@@ -45,30 +45,27 @@ class Sandbox {
         ).value;
     }
 
-    at([x, y]: Vec2): CellState {
-        return this.grid.get(`${x}:${y}`) ?? 'air';
-    }
-
     isAvailable([x, y]: Vec2, floorDepth: number): boolean {
-        return y !== floorDepth && this.at([x, y]) === 'air';
+        return y !== floorDepth && !this.occupiedCells.has(`${x}:${y}`);
     }
 
     addGrain({ hasFloor }: { hasFloor: boolean }): boolean {
         const sandGrain = Vec2.from(500, 0);
         const floorDepth = hasFloor ? this.deepestLineY + 2 : Infinity;
 
-        while ((hasFloor && !this.grid.has('500:0')) || (!hasFloor && (sandGrain[1] <= this.deepestLineY))) {
-            if (this.isAvailable(Vec2.add(sandGrain, [0, 1]), floorDepth)) {
-                Vec2.addMut(sandGrain, [0, 1]);
-            } else {
-                if (this.isAvailable(Vec2.add(sandGrain, [-1, 1]), floorDepth)) {
-                    Vec2.addMut(sandGrain, [-1, 1]);
-                } else if (this.isAvailable(Vec2.add(sandGrain, [1, 1]), floorDepth)) {
-                    Vec2.addMut(sandGrain, [1, 1]);
-                } else {
-                    this.grid.set(`${sandGrain[0]}:${sandGrain[1]}`, 'sand');
-                    return true;
+        while ((hasFloor && !this.occupiedCells.has('500:0')) || (!hasFloor && (sandGrain[1] <= this.deepestLineY))) {
+            let foundSpot = false;
+            for (const delta of this.SPOTS) {
+                if (this.isAvailable(Vec2.add(sandGrain, delta), floorDepth)) {
+                    Vec2.addMut(sandGrain, delta);
+                    foundSpot = true;
+                    break;
                 }
+            }
+
+            if (!foundSpot) {
+                this.occupiedCells.add(`${sandGrain[0]}:${sandGrain[1]}`);
+                return true;
             }
         }
 

@@ -383,3 +383,7 @@ export function* history<T>(it_: II<T>, historyLen = 2): It<T[]> {
 		prev.push(val);
 	}
 }
+
+export const sorted = <T>(vals: II<T>, cmp: (a: T, b: T) => number): II<T> => {
+	return [...vals].sort(cmp);
+};
