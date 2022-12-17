@@ -38,10 +38,11 @@ export class Graph<Label = string> {
     }
 
     public getCost(a: Label, b: Label): number {
-        return this.costs.get(`${a} -> ${b}`)!;
+        return this.costs.get(`${a} -> ${b}`) ?? Infinity;
     }
 }
 
+// single-source shortest paths
 export const dijkstra = <Label = string>(g: Graph<Label>, source: Label) => {
     const unvisited = new Heap<Label, number>(
         g.getVertices().map(v => [v, v === source ? 0 : Infinity]),
@@ -69,4 +70,28 @@ export const dijkstra = <Label = string>(g: Graph<Label>, source: Label) => {
     }
 
     return distances;
+};
+
+// all-pairs shortest paths
+export const floydWarshall = <Label extends string | number>(g: Graph<Label>) => {
+    const dists = new Map<`${Label} -> ${Label}`, number>();
+
+    for (const v of g.getVertices()) {
+        for (const u of g.getVertices()) {
+            dists.set(`${u} -> ${v}`, g.getCost(u, v));
+        }
+    }
+
+    for (const k of g.getVertices()) {
+        for (const i of g.getVertices()) {
+            for (const j of g.getVertices()) {
+                const ikj = (dists.get(`${i} -> ${k}`) ?? Infinity) + (dists.get(`${k} -> ${j}`) ?? Infinity);
+                if (ikj < (dists.get(`${i} -> ${j}`) ?? Infinity)) {
+                    dists.set(`${i} -> ${j}`, ikj);
+                }
+            }
+        }
+    }
+
+    return dists;
 };

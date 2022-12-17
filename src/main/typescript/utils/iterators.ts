@@ -387,3 +387,31 @@ export function* history<T>(it_: II<T>, historyLen = 2): It<T[]> {
 export const sorted = <T>(vals: II<T>, cmp: (a: T, b: T) => number): II<T> => {
 	return [...vals].sort(cmp);
 };
+
+export const insertMapArray = <K, V>(map: Map<K, V[]>, key: K, value: V): void => {
+	if (!map.has(key)) {
+		map.set(key, [value]);
+	} else {
+		map.get(key)?.push(value);
+	}
+};
+
+export const groupBy = <T, Group>(vals: T[], groupOf: (val: T) => Group): Map<Group, T[]> => {
+	const groups = new Map<Group, T[]>();
+
+	vals.forEach(val => {
+		insertMapArray(groups, groupOf(val), val);
+	});
+
+	return groups;
+};
+
+export const groupByUnique = <T, Group>(vals: T[], groupOf: (val: T) => Group): Map<Group, T> => {
+	const groups = new Map<Group, T>();
+
+	vals.forEach(val => {
+		groups.set(groupOf(val), val);
+	});
+
+	return groups;
+};
