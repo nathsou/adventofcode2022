@@ -32,7 +32,6 @@ class Chamber {
     private rocks = new Set<number>();
     private rock: { shape: Shape, pos: Vec2 };
     public maxY = -1;
-    public rocksDropped = 0;
     private topMostRocks = [-1, -1, -1, -1, -1, -1, -1];
 
     constructor() {
@@ -42,7 +41,7 @@ class Chamber {
     private hash(): string {
         const result: string[] = [];
         const highestY = max(this.topMostRocks).value;
-        const lowestY = highestY - 50;
+        const lowestY = Math.max(highestY - 50, 0);
 
         for (let y = lowestY; y <= highestY; y++) {
             const line: string[] = [];
@@ -82,7 +81,6 @@ class Chamber {
     }
 
     public bringRockToRest() {
-        this.rocksDropped += 1;
         this.maxY = Math.max(this.maxY, this.rock.pos[1]);
         for (let j = 0; j < this.rock.shape.length; j++) {
             for (let i = 0; i < this.rock.shape[j].length; i++) {
@@ -155,18 +153,10 @@ const computeTotalHeight = ({ startIndex, length, deltaYs }: Cycle, N: number): 
     return totalHeight;
 };
 
-const part1 = () => {
-    const dirs = parseInput();
-    const chamber = new Chamber();
-    const cycle = chamber.findCycle(dirs);
-    return computeTotalHeight(cycle, 2022);
-};
+const chamber = new Chamber();
+const rockCycle = chamber.findCycle(parseInput());
 
-const part2 = () => {
-    const dirs = parseInput();
-    const chamber = new Chamber();
-    const cycle = chamber.findCycle(dirs);
-    return computeTotalHeight(cycle, 1000000000000);
-};
+const part1 = () => computeTotalHeight(rockCycle, 2022);
+const part2 = () => computeTotalHeight(rockCycle, 1000000000000);
 
 run({ part1, part2 });

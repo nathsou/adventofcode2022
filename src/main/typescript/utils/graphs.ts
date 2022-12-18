@@ -15,6 +15,10 @@ export class Graph<Label = string> {
         }
     }
 
+    public hasVertex(label: Label): boolean {
+        return this.adjacencyLists.has(label);
+    }
+
     public getVertices(): Label[] {
         return [...this.adjacencyLists.keys()];
     }
@@ -94,4 +98,21 @@ export const floydWarshall = <Label extends string | number>(g: Graph<Label>) =>
     }
 
     return dists;
+};
+
+export const bfs = <Label = string>(g: Graph<Label>, source: Label): Set<Label> => {
+    const queue = [source];
+    const visited = new Set<Label>();
+
+    while (queue.length > 0) {
+        const u = queue.shift()!;
+        if (!visited.has(u)) {
+            visited.add(u);
+            for (const v of g.adjacentVertices(u)) {
+                queue.push(v);
+            }
+        }
+    }
+
+    return visited;
 };
