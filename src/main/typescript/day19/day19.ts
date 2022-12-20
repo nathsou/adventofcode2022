@@ -115,21 +115,21 @@ const search = (blueprint: Blueprint, minutes: number) => {
   };
 
   const memo = new Map<string, number>();
-  const maxGeodsAt = new Map<number, number>();
+  const maxGeodesAt = new Map<number, number>();
 
   const go = (t: number, state: State): number => {
     if (t === 0) {
       return state.geode;
     }
 
-    const maxAtT = maxGeodsAt.get(t) ?? 0;
+    const maxAtT = maxGeodesAt.get(t) ?? 0;
 
     if (maxAtT - state.geode > 2) {
       return 0;
     }
 
     if (state.geode > maxAtT) {
-      maxGeodsAt.set(t, state.geode);
+      maxGeodesAt.set(t, state.geode);
     }
 
     const key = hash(t, state);
@@ -142,8 +142,9 @@ const search = (blueprint: Blueprint, minutes: number) => {
     const canBuildOreRobot = state.ore >= blueprint.oreRobotCost.ore;
     const canBuildClayRobot = state.ore >= blueprint.clayRobotCost.ore;
     const canBuildObsidianRobot = state.ore >= blueprint.obsidianRobotCost.ore && state.clay >= blueprint.obsidianRobotCost.clay;
+    const canBuildGeodeRobot = state.ore >= blueprint.geodeRobotCost.ore && state.obsidian >= blueprint.geodeRobotCost.obsidian;
 
-    if (state.ore >= blueprint.geodeRobotCost.ore && state.obsidian >= blueprint.geodeRobotCost.obsidian) {
+    if (canBuildGeodeRobot) {
       possibleActions.push({ type: 'build', kind: 'geode' });
     } else {
       if (canBuildOreRobot && state.oreRobots < maxNeededOres) {
