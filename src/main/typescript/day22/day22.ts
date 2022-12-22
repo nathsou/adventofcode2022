@@ -4,25 +4,18 @@ import { run } from "../utils/run";
 
 const USE_SAMPLE = false;
 
+type Pos = { x: number, y: number };
 type PosHash = string;
 
 const hash = (x: number, y: number): PosHash => `${x}:${y}`;
 
-class Rect {
-  public x: number;
-  public y: number;
-  public width: number;
-  public height: number;
-  public walls: Set<PosHash>;
-
-  constructor(x: number, y: number, width: number, height: number) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this.walls = new Set();
-  }
-}
+type Rect = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  walls: Set<PosHash>;
+};
 
 type Dir = "N" | "E" | "S" | "W";
 
@@ -82,13 +75,6 @@ const splitFaces = (rects: Rect[], side: number) => {
 
   return faces;
 };
-
-// 1 -> top
-// 2 -> back
-// 3 -> left
-// 4 -> front
-// 5 -> bottom
-// 6 -> right
 
 type CubeFace = 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -150,19 +136,19 @@ const WRAP_FACE = USE_SAMPLE ? WRAP_FACE_SAMPLE : WRAP_FACE_INPUT;
 
 const SIDE = USE_SAMPLE ? 4 : 50;
 
-const rotate90Degrees = (x: number, y: number): { x: number, y: number } => {
+const rotate90Degrees = (x: number, y: number): Pos => {
   return { x: SIDE - 1 - y, y: x };
 };
 
-const rotate180Degrees = (x: number, y: number): { x: number, y: number } => {
+const rotate180Degrees = (x: number, y: number): Pos => {
   return { x: SIDE - 1 - x, y: SIDE - 1 - y };
 };
 
-const rotate270Degrees = (x: number, y: number): { x: number, y: number } => {
+const rotate270Degrees = (x: number, y: number): Pos => {
   return { x: y, y: SIDE - 1 - x };
 };
 
-const rotatePos = (x: number, y: number, startDir: Dir, endDir: Dir): { x: number, y: number } => {
+const rotatePos = (x: number, y: number, startDir: Dir, endDir: Dir): Pos => {
   const startIdx = DIR_INDEX[startDir];
   const endIdx = DIR_INDEX[endDir];
 
@@ -192,7 +178,6 @@ class Field {
   public dir: Dir;
   public rects: Rect[];
   public faces: Map<number, { minX: number, minY: number, maxX: number, maxY: number }>;
-  public isCube = true;
 
   constructor(rects: Rect[]) {
     this.rects = rects;
@@ -208,7 +193,9 @@ class Field {
   }
 
   verticalBoundsAt(x: number, y: number): { minY: number, maxY: number } {
-    const idx = this.rects.findIndex(rect => rect.x <= x && x < rect.x + rect.width && rect.y <= y && y < rect.y + rect.height)!;
+    const idx = this.rects.findIndex(rect =>
+      rect.x <= x && x < rect.x + rect.width && rect.y <= y && y < rect.y + rect.height
+    )!;
 
     if (idx === -1) {
       throw new Error(`invalid position: ${x}, ${y}`);
@@ -249,8 +236,6 @@ class Field {
   }
 
   prevDir: Dir = 'E';
-
-  private index = 0;
 
   wrapAroundCube(x: number, y: number, dir: Dir): { x: number, y: number, nextDir: Dir } {
     const faceId = this.faceAt(x, y);
@@ -336,7 +321,7 @@ const lineStart = (line: string) => Math.min(line.indexOf("#"), line.indexOf("."
 
 type Command = { type: "forward", steps: number } | { type: "turn", direction: "L" | "R" };
 
-const parseMoves = (moves: string) => {
+const parseMoves = (moves: string): Command[] => {
   const res: Command[] = [];
   let steps = 0;
 
@@ -360,12 +345,19 @@ const parseMoves = (moves: string) => {
 };
 
 const parseInput = (): [Field, Command[]] => {
-  let [field, moves] = readFileSync(USE_SAMPLE ? "./sample.txt" : "./input.txt")
+  const [field, moves] = readFileSync(USE_SAMPLE ? "./sample.txt" : "./input.txt")
     .toString("utf-8")
     .split("\n\n");
 
   const lines = field.split("\n");
-  const rects: Rect[] = [new Rect(lineStart(lines[0]), 0, lineWidth(lines[0]), 0)];
+  const rects: Rect[] = [{
+    x: lineStart(lines[0]),
+    y: 0,
+    width:
+      lineWidth(lines[0]),
+    height: 0,
+    walls: new Set(),
+  }];
 
   for (const [line, y] of indexed(lines)) {
     const width = lineWidth(line);
@@ -373,7 +365,7 @@ const parseInput = (): [Field, Command[]] => {
     if (width !== rect.width) {
       const height = y - rect.y;
       rect.height = height;
-      rects.push(new Rect(lineStart(line), y, width, 0));
+      rects.push({ x: lineStart(line), y, width, height: 0, walls: new Set() });
       rect = rects.at(-1)!;
     }
 
