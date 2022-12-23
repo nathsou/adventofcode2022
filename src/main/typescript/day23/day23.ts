@@ -6,12 +6,16 @@ const DEBUG = false;
 
 type Dir = 'N' | 'S' | 'E' | 'W' | 'NE' | 'NW' | 'SE' | 'SW';
 type Pos = { x: number, y: number };
-type PosHash = `${number}:${number}`;
+type PosHash = number;
 
-const hashPos = (x: number, y: number): PosHash => `${x}:${y}`;
+const K = 1000;
+const OFFSET = { x: K / 2, y: K / 2 };
+
+const hashPos = (x: number, y: number): PosHash => (OFFSET.x + x) * K + (OFFSET.y + y);
 
 const parsePos = (pos: PosHash): Pos => {
-  const [x, y] = pos.split(":").map(Number);
+  const x = Math.floor(pos / K) - OFFSET.x;
+  const y = pos - (x + OFFSET.x) * K - OFFSET.y;
   return { x, y };
 };
 
@@ -27,7 +31,7 @@ const parseInput = (): ElfMap => {
   for (const [line, y] of indexed(lines)) {
     for (const [char, x] of indexed(line)) {
       if (char === "#") {
-        map.add(`${x}:${y}`);
+        map.add(hashPos(x, y));
       }
     }
   }
@@ -132,6 +136,7 @@ const bounds = (elves: ElfMap): Bounds => {
 
   for (const elf of elves) {
     const { x, y } = parsePos(elf);
+
     minX = Math.min(minX, x);
     maxX = Math.max(maxX, x);
     minY = Math.min(minY, y);
@@ -158,17 +163,8 @@ const show = (elves: ElfMap) => {
 
 const countEmptyTiles = (elves: ElfMap): number => {
   const { minX, maxX, minY, maxY } = bounds(elves);
-  let count = 0;
-
-  for (const y of range(minY, maxY)) {
-    for (const x of range(minX, maxX)) {
-      if (!elves.has(hashPos(x, y))) {
-        count++;
-      }
-    }
-  }
-
-  return count;
+  const area = (maxX - minX + 1) * (maxY - minY + 1);
+  return area - elves.size;
 };
 
 const part1 = () => {

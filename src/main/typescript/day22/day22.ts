@@ -225,10 +225,10 @@ class Field {
     return { minY, maxY: maxY - 1 };
   }
 
-  faceAt(x: number, y: number): number {
+  faceAt(x: number, y: number): CubeFace {
     for (const [face, { minX, minY, maxX, maxY }] of this.faces) {
       if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
-        return face;
+        return face as CubeFace;
       }
     }
 
@@ -241,7 +241,7 @@ class Field {
     const { x: dx, y: dy } = DIR_DELTA[dir];
 
     if (x + dx < minX || x + dx > maxX || y + dy < minY || y + dy > maxY) {
-      const { face: nextFace, dir: nextDir } = WRAP_FACE[`${faceId}:${dir}` as `${CubeFace}:${Dir}`];
+      const { face: nextFace, dir: nextDir } = WRAP_FACE[`${faceId}:${dir}`];
       let newX = rem(x + dx, SIDE);
       let newY = rem(y + dy, SIDE);
 
