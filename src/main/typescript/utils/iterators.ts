@@ -280,6 +280,16 @@ export function countWhile<T>(
 	return count;
 }
 
+export const countIters = (pred: () => boolean): number => {
+	let count = 0;
+
+	while (pred()) {
+		count++;
+	}
+
+	return count;
+};
+
 export function all<T>(
 	as: II<T>,
 	pred: (a: T) => boolean,

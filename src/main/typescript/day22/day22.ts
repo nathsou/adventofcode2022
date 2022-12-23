@@ -235,8 +235,6 @@ class Field {
     throw new Error(`invalid position: ${x}, ${y}`);
   }
 
-  prevDir: Dir = 'E';
-
   wrapAroundCube(x: number, y: number, dir: Dir): { x: number, y: number, nextDir: Dir } {
     const faceId = this.faceAt(x, y);
     const { minX, maxX, minY, maxY } = this.faces.get(faceId)!;
