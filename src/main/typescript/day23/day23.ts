@@ -78,16 +78,21 @@ const proposeMoves = (elves: ElfMap, dirs: RotatedDirections) => {
     const { x, y } = parsePos(elf);
 
     for (const { ifFree, go } of dirs.directions) {
-      const completelyFree = ALL_DIRECTIONS.every(dir => {
-        const { x: dx, y: dy } = DIR_DELTA[dir];
-        return !elves.has(hashPos(x + dx, y + dy));
-      });
+      const surroundings: Record<Dir, boolean> = {
+        N: elves.has(hashPos(x, y - 1)),
+        S: elves.has(hashPos(x, y + 1)),
+        E: elves.has(hashPos(x + 1, y)),
+        W: elves.has(hashPos(x - 1, y)),
+        NE: elves.has(hashPos(x + 1, y - 1)),
+        NW: elves.has(hashPos(x - 1, y - 1)),
+        SE: elves.has(hashPos(x + 1, y + 1)),
+        SW: elves.has(hashPos(x - 1, y + 1)),
+      };
+
+      const completelyFree = ALL_DIRECTIONS.every(dir => !surroundings[dir]);
 
       if (!completelyFree) {
-        if (ifFree.every(dir => {
-          const { x: dx, y: dy } = DIR_DELTA[dir];
-          return !elves.has(hashPos(x + dx, y + dy));
-        })) {
+        if (ifFree.every(dir => !surroundings[dir])) {
           const delta = DIR_DELTA[go];
           const key = hashPos(x + delta.x, y + delta.y);
           propositionCounts.set(key, (propositionCounts.get(key) ?? 0) + 1);
@@ -146,7 +151,7 @@ const bounds = (elves: ElfMap): Bounds => {
   return { minX, maxX, minY, maxY };
 };
 
-const show = (elves: ElfMap) => {
+const show = (elves: ElfMap): string => {
   const { minX, maxX, minY, maxY } = bounds(elves);
   const lines: string[] = [];
 
