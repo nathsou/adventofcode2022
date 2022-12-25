@@ -425,3 +425,9 @@ export const groupByUnique = <T, Group>(vals: T[], groupOf: (val: T) => Group): 
 
 	return groups;
 };
+
+export function* reverse<T>(elems: T[]): It<T> {
+	for (let i = elems.length - 1; i >= 0; i--) {
+		yield elems[i];
+	}
+}
